@@ -23,5 +23,11 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: LLM_PROVIDER
+        sync: false
+      - key: OPENAI_BASE_URL
+        sync: false
+      - key: OPENAI_TIMEOUT_MS
+        sync: false
       - key: CHAT_HISTORY
         sync: false

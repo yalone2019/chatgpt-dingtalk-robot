@@ -1,0 +1,32 @@
+# Local Hermes Agent (latest pinned tag in hermes/VERSION).
+# Usage:
+#   HERMES_UID=$(id -u) HERMES_GID=$(id -g) docker compose -f docker-compose.hermes.yml up -d
+# Update:
+#   ./scripts/update-hermes.sh
+#
+# Config and sessions persist in ~/.hermes (mounted at /opt/data).
+# Do not mount /opt/hermes — that masks image upgrades.
+
+services:
+  hermes:
+    image: nousresearch/hermes-agent:v2026.9.14
+    container_name: hermes
+    restart: unless-stopped
+    command: ["gateway", "run"]
+    ports:
+      - "127.0.0.1:8642:8642"
+      - "127.0.0.1:9119:9119"
+    volumes:
+      - ${HERMES_HOME:-${HOME}/.hermes}:/opt/data
+    environment:
+      - HERMES_UID=${HERMES_UID:-1000}
+      - HERMES_GID=${HERMES_GID:-1000}
+      - HERMES_DASHBOARD=${HERMES_DASHBOARD:-0}
+      - API_SERVER_ENABLED=${API_SERVER_ENABLED:-true}
+      - API_SERVER_HOST=0.0.0.0
+      - API_SERVER_KEY=${API_SERVER_KEY:-change-me-local-dev}
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
