@@ -9,6 +9,7 @@
     "update-hermes": "bash scripts/update-hermes.sh",
     "update-hermes:check": "bash scripts/update-hermes.sh --check",
     "install-hermes": "bash scripts/install-hermes.sh",
+    "configure-deepseek": "bash scripts/configure-deepseek.sh",
     "vercel-build": "echo hello"
   },
   "keywords": [],

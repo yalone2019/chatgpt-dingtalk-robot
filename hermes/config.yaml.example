@@ -1,0 +1,6 @@
+# Copy into ~/.hermes/config.yaml (merge with your existing file).
+# The API key must live in ~/.hermes/.env as DEEPSEEK_API_KEY — not here.
+
+model:
+  provider: deepseek
+  default: deepseek-flash

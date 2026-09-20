@@ -15,6 +15,8 @@ async function loadClient(env) {
         "OPENAI_BASE_URL",
         "OPENAI_MODEL",
         "OPENAI_API_KEY",
+        "DEEPSEEK_API_KEY",
+        "API_SERVER_KEY",
         "OPENAI_TIMEOUT_MS"
     ]) {
         if (env[key] === undefined) {
@@ -32,6 +34,19 @@ test("hermes provider points at local gateway", async () => {
     assert.equal(client.resolveModel(), "hermes-agent");
     assert.equal(client.isLocalHermes(), true);
     assert.equal(client.resolveChatCompletionsUrl(), "http://127.0.0.1:8642/v1/chat/completions");
+});
+
+test("deepseek provider uses official DeepSeek endpoint", async () => {
+    const client = await loadClient({
+        LLM_PROVIDER: "deepseek",
+        DEEPSEEK_API_KEY: "sk-test-deepseek"
+    });
+    assert.equal(client.resolveBaseUrl(), "https://api.deepseek.com");
+    assert.equal(client.resolveModel(), "deepseek-flash");
+    assert.equal(client.isDeepseek(), true);
+    assert.equal(client.isLocalHermes(), false);
+    assert.equal(client.resolveApiKey(), "sk-test-deepseek");
+    assert.equal(client.resolveChatCompletionsUrl(), "https://api.deepseek.com/chat/completions");
 });
 
 test("explicit OpenAI base URL is preserved", async () => {

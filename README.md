@@ -3,7 +3,7 @@
 
 ## 本地 Hermes Agent 最新版
 
-本仓库已对接 [NousResearch Hermes Agent](https://github.com/NousResearch/hermes-agent) 最新稳定版（当前固定 **v0.21.3 / `v2026.9.14`**）。本地部署优先走 Hermes，不再依赖公网 OpenAI。
+本仓库已对接 [NousResearch Hermes Agent](https://github.com/NousResearch/hermes-agent) 最新稳定版（当前固定 **v0.21.3 / `v2026.9.14`**）。Hermes 默认模型为 **DeepSeek `deepseek-flash`**。
 
 ```bash
 # 查看是否已是最新版
@@ -22,10 +22,10 @@
    - 安装或更新后执行 `hermes setup`，再 `hermes gateway setup` 选择 DingTalk
    - 把 AppKey / AppSecret 写入 `~/.hermes/.env`（模板见 `hermes/env.example`）
    - 启动：`hermes gateway`
-2. **兼容本仓库 webhook 机器人**：让 Node 服务把对话转发到本地 Hermes OpenAI 兼容接口
-   - 复制 `.env.example` 为 `.env`（`LLM_PROVIDER=hermes`，`OPENAI_BASE_URL=http://127.0.0.1:8642/v1`）
-   - 在 Hermes 侧开启 `API_SERVER_ENABLED=true`，`OPENAI_API_KEY` 必须与 `API_SERVER_KEY` 一致
-   - Docker：`HERMES_UID=$(id -u) HERMES_GID=$(id -g) docker compose -f docker-compose.hermes.yml up -d`
+2. **兼容本仓库 webhook 机器人**
+   - DeepSeek（默认）：复制 `.env.example` 为 `.env`，设置 `LLM_PROVIDER=deepseek`、`OPENAI_MODEL=deepseek-flash`，把 Key 放进 `DEEPSEEK_API_KEY`（不要提交 `.env`）
+   - 或运行 `DEEPSEEK_API_KEY=sk-xxx ./scripts/configure-deepseek.sh`，同时写入本仓库 `.env` 和 `~/.hermes/.env`
+   - 若仍要走本地 Hermes 网关：`LLM_PROVIDER=hermes`，`OPENAI_BASE_URL=http://127.0.0.1:8642/v1`
 
 更新后可用 `hermes --version`、`hermes doctor`、`hermes gateway status` 核对。Docker 安装不要在容器内执行 `hermes update`，由 `./scripts/update-hermes.sh` 拉新镜像并重建容器。
 
@@ -280,10 +280,11 @@ docker run --env-file .env.local -p 6060:6060 -d docker4bill/ww-openai-node:alpi
 | --------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | APPKEY                            |                                |                                                                                                                                           |
 | APPSECRET                         |                                |                                                                                                                                           |
-| OPENAI_API_KEY                    |                                | 官方 OpenAI Key；本地 Hermes 时填 `API_SERVER_KEY`                                                                                         |
-| OPENAI_MODEL                      |  hermes-agent                  | 本地 Hermes 用 `hermes-agent`；云端仍可用 gpt-3.5-turbo / gpt-4                                                                            |
-| LLM_PROVIDER                      |  hermes                        | `hermes` 走本地网关；`openai` 或不填且无 BASE_URL 时走官方 API                                                                              |
-| OPENAI_BASE_URL                   |  http://127.0.0.1:8642/v1      | Hermes OpenAI 兼容接口；官方 API 可留空                                                                                                    |
+| OPENAI_API_KEY                    |                                | 官方 OpenAI Key；DeepSeek 时可与 `DEEPSEEK_API_KEY` 填同一值                                                                               |
+| DEEPSEEK_API_KEY                  |                                | DeepSeek 密钥；Hermes 内置 deepseek provider 只读这个环境变量                                                                              |
+| OPENAI_MODEL                      |  deepseek-flash                | Hermes 默认 DeepSeek 模型；本地网关可用 `hermes-agent`                                                                                     |
+| LLM_PROVIDER                      |  deepseek                      | `deepseek` / `hermes` / `openai`                                                                                                           |
+| OPENAI_BASE_URL                   |  https://api.deepseek.com      | DeepSeek 官方接口；本地 Hermes 网关则为 `http://127.0.0.1:8642/v1`                                                                         |
 | OPENAI_TIMEOUT_MS                 |  180000                        | 本地 Agent 工具调用较慢，建议 3 分钟以上                                                                                                   |
 | PORT                              |  7070                          |     可以改成其他                                                                                                                          |
 |CHAT_HISTORY                       |  no                            |     yes 或者 no  yes支持上下文会话，no 不支持上下文，区别上下文对话token 成本高                                                             |
