@@ -50,15 +50,26 @@ path.parent.mkdir(parents=True, exist_ok=True)
 snippet = """model:
   provider: deepseek
   default: deepseek-flash
+  base_url: https://api.deepseek.com
 """
 existing = path.read_text(encoding="utf-8") if path.exists() else ""
 if "provider: deepseek" in existing and "deepseek-flash" in existing:
+    if "base_url:" not in existing:
+        path.write_text(existing.rstrip() + "\n  base_url: https://api.deepseek.com\n", encoding="utf-8")
     sys.exit(0)
 if existing.strip():
     path.write_text(existing.rstrip() + "\n\n" + snippet, encoding="utf-8")
 else:
     path.write_text(snippet, encoding="utf-8")
 PY
+
+if command -v hermes >/dev/null 2>&1 || [[ -x "${HOME}/.local/bin/hermes" ]]; then
+  export PATH="${HOME}/.local/bin:${PATH}"
+  hermes config set model.provider deepseek >/dev/null
+  hermes config set model.default deepseek-flash >/dev/null
+  hermes config set model.base_url https://api.deepseek.com >/dev/null
+  echo "Hermes CLI model: $(hermes config get model.provider) / $(hermes config get model.default)"
+fi
 
 echo "DeepSeek configured as Hermes model deepseek-flash."
 echo "Wrote local .env (gitignored) and ${HERMES_ENV}."

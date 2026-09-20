@@ -4,3 +4,4 @@
 model:
   provider: deepseek
   default: deepseek-flash
+  base_url: https://api.deepseek.com
